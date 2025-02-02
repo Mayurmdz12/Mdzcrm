@@ -27,7 +27,7 @@
         function searchClient() {
             var searchValue = document.getElementById("searchInput").value;
             var searchType = document.getElementById("searchType").value;
-            var scriptURL = "https://script.google.com/macros/s/AKfycbxiWLMAjTNXpalyKK4BDM7yOwxiqb7LUXfoJShIgbk4drwq1jjQjWGRXoeRnE3uyO6b/exec?search=" + encodeURIComponent(searchValue) + "&type=" + searchType;
+            var scriptURL = "https://script.google.com/macros/s/AKfycbyROKJvpqiQ6FptHMnPq8UpRZ14hxuT_9kNQz32w5E/dev?search=" + encodeURIComponent(searchValue) + "&type=" + searchType;
 
             fetch(scriptURL)
                 .then(response => response.json())
