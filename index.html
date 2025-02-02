@@ -25,13 +25,22 @@
 
     <script>
         function searchClient() {
-            var searchValue = document.getElementById("searchInput").value;
+            var searchValue = document.getElementById("searchInput").value.trim();
             var searchType = document.getElementById("searchType").value;
-            var scriptURL = "https://script.google.com/macros/s/AKfycbxiWLMAjTNXpalyKK4BDM7yOwxiqb7LUXfoJShIgbk4drwq1jjQjWGRXoeRnE3uyO6b/exec?search=" + encodeURIComponent(searchValue) + "&type=" + searchType;
+            var scriptURL = "YOUR_DEPLOYED_URL?search=" + encodeURIComponent(searchValue) + "&type=" + searchType;
+
+            console.log("Fetching data from:", scriptURL);
 
             fetch(scriptURL)
-                .then(response => response.json())  // Ensure JSON response
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Network response was not ok");
+                    }
+                    return response.json();
+                })
                 .then(data => {
+                    console.log("API Response:", data);
+
                     if (data.error) {
                         document.getElementById("result").innerHTML = "<span class='text-red-500'>" + data.error + "</span>";
                     } else {
@@ -84,8 +93,8 @@
                     }
                 })
                 .catch(error => {
-                    document.getElementById("result").innerHTML = "<span class='text-red-500'>Error fetching data. Check console.</span>";
-                    console.error('Error:', error);
+                    console.error("Fetch Error:", error);
+                    document.getElementById("result").innerHTML = "<span class='text-red-500'>Error fetching data.</span>";
                 });
         }
     </script>
