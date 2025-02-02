@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Search</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
+        <h2 class="text-xl font-semibold text-center mb-4">🔍 Search Client</h2>
+        <input type="text" id="searchInput" class="border p-2 w-full rounded mb-2" placeholder="Enter Client ID or Number">
+        <select id="searchType" class="border p-2 w-full rounded mb-4">
+            <option value="id">Client ID</option>
+            <option value="number">Client Number</option>
+        </select>
+        <button onclick="searchClient()" class="bg-blue-500 text-white px-4 py-2 w-full rounded">Search</button>
+
+        <div id="result" class="mt-4 text-center font-semibold"></div>
+    </div>
+
+    <script>
+        function searchClient() {
+            var searchValue = document.getElementById("searchInput").value;
+            var searchType = document.getElementById("searchType").value;
+            var scriptURL = "YOUR_WEB_APP_URL?search=" + encodeURIComponent(searchValue) + "&type=" + searchType;
+
+            fetch(scriptURL)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById("result").innerHTML = "<span class='text-red-500'>" + data.error + "</span>";
+                    } else {
+                        document.getElementById("result").innerHTML = "<div class='p-4 bg-green-100 rounded'>" + JSON.stringify(data) + "</div>";
+                    }
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+    </script>
+
+</body>
+</html>
