@@ -8,23 +8,26 @@
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
-    <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
-        <h2 class="text-xl font-semibold text-center mb-4">🔍 Search Client</h2>
-        <input type="text" id="searchInput" class="border p-2 w-full rounded mb-2" placeholder="Enter Client ID or Number">
-        <select id="searchType" class="border p-2 w-full rounded mb-4">
-            <option value="id">Client ID</option>
-            <option value="number">Client Number</option>
-        </select>
-        <button onclick="searchClient()" class="bg-blue-500 text-white px-4 py-2 w-full rounded">Search</button>
+    <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-3xl">
+        <h2 class="text-2xl font-semibold text-center mb-4">🔍 Search Client</h2>
 
-        <div id="result" class="mt-4 text-center font-semibold"></div>
+        <div class="flex gap-2">
+            <input type="text" id="searchInput" class="border p-2 w-full rounded" placeholder="Enter Client ID or Number">
+            <select id="searchType" class="border p-2 rounded">
+                <option value="id">Client ID (UCC)</option>
+                <option value="number">Client Number</option>
+            </select>
+            <button onclick="searchClient()" class="bg-blue-500 text-white px-4 py-2 rounded">Search</button>
+        </div>
+
+        <div id="result" class="mt-4"></div>
     </div>
 
     <script>
         function searchClient() {
             var searchValue = document.getElementById("searchInput").value;
             var searchType = document.getElementById("searchType").value;
-            var scriptURL = "YOUR_WEB_APP_URL?search=" + encodeURIComponent(searchValue) + "&type=" + searchType;
+            var scriptURL = "https://script.google.com/macros/s/AKfycbxiWLMAjTNXpalyKK4BDM7yOwxiqb7LUXfoJShIgbk4drwq1jjQjWGRXoeRnE3uyO6b/exec?search=" + encodeURIComponent(searchValue) + "&type=" + searchType;
 
             fetch(scriptURL)
                 .then(response => response.json())
@@ -32,12 +35,61 @@
                     if (data.error) {
                         document.getElementById("result").innerHTML = "<span class='text-red-500'>" + data.error + "</span>";
                     } else {
-                        document.getElementById("result").innerHTML = "<div class='p-4 bg-green-100 rounded'>" + JSON.stringify(data) + "</div>";
+                        let table = `<table class='w-full mt-4 border-collapse border border-gray-400'>
+                            <thead>
+                                <tr class='bg-gray-200'>
+                                    <th class='border p-2'>Client Code (UCC)</th>
+                                    <th class='border p-2'>Name</th>
+                                    <th class='border p-2'>Number</th>
+                                    <th class='border p-2'>Partner</th>
+                                    <th class='border p-2'>Reference</th>
+                                    <th class='border p-2'>Shifted to Us</th>
+                                    <th class='border p-2'>XX Client Shift to Other</th>
+                                    <th class='border p-2'>XX Shifted Reason</th>
+                                    <th class='border p-2'>Male/Female</th>
+                                    <th class='border p-2'>Married</th>
+                                    <th class='border p-2'>DOB</th>
+                                    <th class='border p-2'>HNI</th>
+                                    <th class='border p-2'>Business</th>
+                                    <th class='border p-2'>Dependence</th>
+                                    <th class='border p-2'>Interest</th>
+                                    <th class='border p-2'>Partner/Employee Group</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+
+                        data.forEach(row => {
+                            table += `<tr>
+                                <td class='border p-2'>${row[0]}</td>
+                                <td class='border p-2'>${row[1]}</td>
+                                <td class='border p-2'>${row[2]}</td>
+                                <td class='border p-2'>${row[3]}</td>
+                                <td class='border p-2'>${row[4]}</td>
+                                <td class='border p-2'>${row[5]}</td>
+                                <td class='border p-2'>${row[6]}</td>
+                                <td class='border p-2'>${row[7]}</td>
+                                <td class='border p-2'>${row[8]}</td>
+                                <td class='border p-2'>${row[9]}</td>
+                                <td class='border p-2'>${row[10]}</td>
+                                <td class='border p-2'>${row[11]}</td>
+                                <td class='border p-2'>${row[12]}</td>
+                                <td class='border p-2'>${row[13]}</td>
+                                <td class='border p-2'>${row[14]}</td>
+                                <td class='border p-2'>${row[15]}</td>
+                            </tr>`;
+                        });
+
+                        table += "</tbody></table>";
+                        document.getElementById("result").innerHTML = table;
                     }
                 })
-                .catch(error => console.error('Error fetching data:', error));
+                .catch(error => {
+                    document.getElementById("result").innerHTML = "<span class='text-red-500'>Error fetching data</span>";
+                    console.error('Error:', error);
+                });
         }
     </script>
 
 </body>
 </html>
+
