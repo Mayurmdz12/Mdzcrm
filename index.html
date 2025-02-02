@@ -27,7 +27,7 @@
         function searchClient() {
             var searchValue = document.getElementById("searchInput").value.trim();
             var searchType = document.getElementById("searchType").value;
-            var scriptURL = "YOUR_DEPLOYED_URL?search=" + encodeURIComponent(searchValue) + "&type=" + searchType;
+            var scriptURL = "https://script.google.com/macros/s/AKfycbyHvliCCoDkCEX8SeO04x_cEDM5PPxRejghqCVmpwe5hvOSgy3rZ0AH6dN7EnfrK1D5/exec?search=" + encodeURIComponent(searchValue) + "&type=" + searchType;
 
             console.log("Fetching data from:", scriptURL);
 
