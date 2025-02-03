@@ -6,25 +6,36 @@
     <title>Client Search</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<body class="bg-gray-200 font-sans">
 
-    <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-3xl">
-        <h2 class="text-2xl font-semibold text-center mb-4">🔍 Search Client</h2>
+    <div class="container mx-auto p-6 bg-white rounded-lg shadow-xl mt-8 max-w-4xl">
+        <h2 class="text-3xl font-semibold text-center text-gray-800 mb-6">🔍 Client Search</h2>
 
-        <div class="flex gap-2">
-            <input type="text" id="searchInput" class="border p-2 w-full rounded" placeholder="Enter Client ID or Number">
-            <select id="searchType" class="border p-2 rounded">
+        <!-- Search Section -->
+        <div class="flex gap-4 mb-6">
+            <input type="text" id="searchInput" class="border p-3 w-full rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter Client ID or Number">
+            <select id="searchType" class="border p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="id">Client ID (UCC)</option>
                 <option value="number">Client Number</option>
             </select>
-            <button onclick="searchClient()" class="bg-blue-500 text-white px-4 py-2 rounded">Search</button>
+            <button onclick="searchClient()" class="bg-blue-500 text-white px-6 py-3 rounded-md hover:bg-blue-600 transition duration-300">Search</button>
         </div>
 
-        <div id="result" class="mt-4"></div>
+        <!-- Results Section -->
+        <div id="result"></div>
+
+        <!-- Save Changes Button -->
+        <button id="saveButton" onclick="saveChanges()" class="bg-green-500 text-white px-6 py-3 rounded-md mt-6 hidden hover:bg-green-600 transition duration-300">Save Changes</button>
     </div>
 
     <script>
+        let editingRowIndex = -1; // Index of the row being edited
+
         function searchClient() {
+            // Clear previous search results
+            document.getElementById("result").innerHTML = '';
+            document.getElementById("saveButton").classList.add('hidden'); // Hide the Save button
+
             var searchValue = document.getElementById("searchInput").value.trim();
             var searchType = document.getElementById("searchType").value;
             var scriptURL = "https://script.google.com/macros/s/AKfycbyHvliCCoDkCEX8SeO04x_cEDM5PPxRejghqCVmpwe5hvOSgy3rZ0AH6dN7EnfrK1D5/exec?search=" + encodeURIComponent(searchValue) + "&type=" + searchType;
@@ -44,51 +55,85 @@
                     if (data.error) {
                         document.getElementById("result").innerHTML = "<span class='text-red-500'>" + data.error + "</span>";
                     } else {
-                        let table = `<table class='w-full mt-4 border-collapse border border-gray-400'>
-                            <thead>
-                                <tr class='bg-gray-200'>
-                                    <th class='border p-2'>Client Code (UCC)</th>
-                                    <th class='border p-2'>Name</th>
-                                    <th class='border p-2'>Number</th>
-                                    <th class='border p-2'>Partner</th>
-                                    <th class='border p-2'>Reference</th>
-                                    <th class='border p-2'>Shifted to Us</th>
-                                    <th class='border p-2'>XX Client Shift to Other</th>
-                                    <th class='border p-2'>XX Shifted Reason</th>
-                                    <th class='border p-2'>Male/Female</th>
-                                    <th class='border p-2'>Married</th>
-                                    <th class='border p-2'>DOB</th>
-                                    <th class='border p-2'>HNI</th>
-                                    <th class='border p-2'>Business</th>
-                                    <th class='border p-2'>Dependence</th>
-                                    <th class='border p-2'>Interest</th>
-                                    <th class='border p-2'>Partner/Employee Group</th>
-                                </tr>
-                            </thead>
-                            <tbody>`;
-
-                        data.forEach(row => {
-                            table += `<tr>
-                                <td class='border p-2'>${row[0]}</td>
-                                <td class='border p-2'>${row[1]}</td>
-                                <td class='border p-2'>${row[2]}</td>
-                                <td class='border p-2'>${row[3]}</td>
-                                <td class='border p-2'>${row[4]}</td>
-                                <td class='border p-2'>${row[5]}</td>
-                                <td class='border p-2'>${row[6]}</td>
-                                <td class='border p-2'>${row[7]}</td>
-                                <td class='border p-2'>${row[8]}</td>
-                                <td class='border p-2'>${row[9]}</td>
-                                <td class='border p-2'>${row[10]}</td>
-                                <td class='border p-2'>${row[11]}</td>
-                                <td class='border p-2'>${row[12]}</td>
-                                <td class='border p-2'>${row[13]}</td>
-                                <td class='border p-2'>${row[14]}</td>
-                                <td class='border p-2'>${row[15]}</td>
-                            </tr>`;
+                        let table = "<div class='grid grid-cols-1 gap-4'>"; // Single column for Client Code, Name, and Number
+                        data.forEach((row, index) => {
+                            // Client Code, Name, and Number in a single row
+                            table += `
+                            <div class='bg-gray-100 rounded-lg p-6 shadow-lg'>
+                                <div class='grid grid-cols-3 gap-4 mb-6'>
+                                    <div>
+                                        <p class='text-gray-700 font-semibold'>Client Code (UCC):</p>
+                                        <p>${row[0]}</p>
+                                    </div>
+                                    <div>
+                                        <p class='text-gray-700 font-semibold'>Name:</p>
+                                        <input type='text' id='name${index}' value='${row[1]}' disabled class='w-full bg-gray-200 p-2 rounded-md'>
+                                    </div>
+                                    <div>
+                                        <p class='text-gray-700 font-semibold'>Number:</p>
+                                        <input type='text' id='number${index}' value='${row[2]}' disabled class='w-full bg-gray-200 p-2 rounded-md'>
+                                    </div>
+                                </div>
+                                <div class='grid grid-cols-2 gap-4'>
+                                    <div>
+                                        <p class='text-gray-700 font-semibold'>Partner:</p>
+                                        <input type='text' id='partner${index}' value='${row[3]}' disabled class='w-full bg-gray-200 p-2 rounded-md'>
+                                    </div>
+                                    <div>
+                                        <p class='text-gray-700 font-semibold'>Reference:</p>
+                                        <input type='text' id='reference${index}' value='${row[4]}' disabled class='w-full bg-gray-200 p-2 rounded-md'>
+                                    </div>
+                                    <div>
+                                        <p class='text-gray-700 font-semibold'>Shifted to Us:</p>
+                                        <input type='text' id='shiftedToUs${index}' value='${row[5]}' disabled class='w-full bg-gray-200 p-2 rounded-md'>
+                                    </div>
+                                    <div>
+                                        <p class='text-gray-700 font-semibold'>XX Client Shift to Other:</p>
+                                        <input type='text' id='xxClientShiftToOther${index}' value='${row[6]}' disabled class='w-full bg-gray-200 p-2 rounded-md'>
+                                    </div>
+                                    <div>
+                                        <p class='text-gray-700 font-semibold'>XX Shifted Reason:</p>
+                                        <input type='text' id='xxShiftedReason${index}' value='${row[7]}' disabled class='w-full bg-gray-200 p-2 rounded-md'>
+                                    </div>
+                                    <div>
+                                        <p class='text-gray-700 font-semibold'>Male/Female:</p>
+                                        <input type='text' id='gender${index}' value='${row[8]}' disabled class='w-full bg-gray-200 p-2 rounded-md'>
+                                    </div>
+                                    <div>
+                                        <p class='text-gray-700 font-semibold'>Married:</p>
+                                        <input type='text' id='married${index}' value='${row[9]}' disabled class='w-full bg-gray-200 p-2 rounded-md'>
+                                    </div>
+                                    <div>
+                                        <p class='text-gray-700 font-semibold'>DOB:</p>
+                                        <input type='text' id='dob${index}' value='${row[10]}' disabled class='w-full bg-gray-200 p-2 rounded-md'>
+                                    </div>
+                                    <div>
+                                        <p class='text-gray-700 font-semibold'>HNI:</p>
+                                        <input type='text' id='hni${index}' value='${row[11]}' disabled class='w-full bg-gray-200 p-2 rounded-md'>
+                                    </div>
+                                    <div>
+                                        <p class='text-gray-700 font-semibold'>Business:</p>
+                                        <input type='text' id='business${index}' value='${row[12]}' disabled class='w-full bg-gray-200 p-2 rounded-md'>
+                                    </div>
+                                    <div>
+                                        <p class='text-gray-700 font-semibold'>Dependence:</p>
+                                        <input type='text' id='dependence${index}' value='${row[13]}' disabled class='w-full bg-gray-200 p-2 rounded-md'>
+                                    </div>
+                                    <div>
+                                        <p class='text-gray-700 font-semibold'>Interest:</p>
+                                        <input type='text' id='interest${index}' value='${row[14]}' disabled class='w-full bg-gray-200 p-2 rounded-md'>
+                                    </div>
+                                    <div>
+                                        <p class='text-gray-700 font-semibold'>Partner/Employee Group:</p>
+                                        <input type='text' id='group${index}' value='${row[15]}' disabled class='w-full bg-gray-200 p-2 rounded-md'>
+                                    </div>
+                                </div>
+                                <button onclick="editRow(${index})" class="bg-yellow-500 text-white px-6 py-2 rounded-md mt-4 hover:bg-yellow-600 transition duration-300">Edit</button>
+                            </div>
+                            `;
                         });
 
-                        table += "</tbody></table>";
+                        table += "</div>";
                         document.getElementById("result").innerHTML = table;
                     }
                 })
@@ -96,6 +141,68 @@
                     console.error("Fetch Error:", error);
                     document.getElementById("result").innerHTML = "<span class='text-red-500'>Error fetching data.</span>";
                 });
+        }
+
+        function editRow(index) {
+            // Enable the inputs of the row for editing
+            const fieldsToEdit = [
+                'partner', 'reference', 'shiftedToUs', 'xxClientShiftToOther', 
+                'xxShiftedReason', 'gender', 'married', 'dob', 'hni', 
+                'business', 'dependence', 'interest', 'group'
+            ];
+
+            fieldsToEdit.forEach(field => {
+                document.getElementById(`${field}${index}`).disabled = false;
+            });
+
+            editingRowIndex = index; // Track the row being edited
+            document.getElementById("saveButton").classList.remove('hidden'); // Show the save button
+        }
+
+        function saveChanges() {
+            if (editingRowIndex === -1) {
+                alert("No row is being edited.");
+                return;
+            }
+
+            // Collect the updated data
+            const updatedData = [];
+            const fieldsToSave = [
+                'partner', 'reference', 'shiftedToUs', 'xxClientShiftToOther', 
+                'xxShiftedReason', 'gender', 'married', 'dob', 'hni', 
+                'business', 'dependence', 'interest', 'group'
+            ];
+
+            fieldsToSave.forEach(field => {
+                updatedData.push(document.getElementById(`${field}${editingRowIndex}`).value);
+            });
+
+            // Send updated data to Google Apps Script
+            var scriptURL = "https://script.google.com/macros/s/AKfycbyHvliCCoDkCEX8SeO04x_cEDM5PPxRejghqCVmpwe5hvOSgy3rZ0AH6dN7EnfrK1D5/exec";
+            var data = {
+                rowIndex: editingRowIndex,
+                updatedData: updatedData
+            };
+
+            fetch(scriptURL, {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    alert("Changes saved successfully!");
+                } else {
+                    alert("Error saving changes.");
+                }
+            })
+            .catch(error => {
+                console.error("Error saving changes:", error);
+                alert("Error saving changes.");
+            });
         }
     </script>
 
